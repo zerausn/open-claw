@@ -1,0 +1,51 @@
+{
+  "models": [
+    {
+      "title": "Gemini 3.1 Pro - Antigravity-Manager",
+      "provider": "openai",
+      "model": "gemini-3.1-pro-high",
+      "apiBase": "http://127.0.0.1:8045/v1",
+      "apiKey": "sk-antigravity"
+    },
+    {
+      "title": "Gemini 3.1 Flash - Antigravity-Manager",
+      "provider": "openai",
+      "model": "gemini-3.1-flash",
+      "apiBase": "http://127.0.0.1:8045/v1",
+      "apiKey": "sk-antigravity"
+    },
+    {
+      "title": "Claude Sonnet 4.6 - Antigravity-Manager",
+      "provider": "openai",
+      "model": "claude-sonnet-4-6",
+      "apiBase": "http://127.0.0.1:8045/v1",
+      "apiKey": "sk-antigravity"
+    },
+    {
+      "title": "Claude Opus 4.6 - Antigravity-Manager",
+      "provider": "openai",
+      "model": "claude-opus-4-6",
+      "apiBase": "http://127.0.0.1:8045/v1",
+      "apiKey": "sk-antigravity"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Flash Autocomplete",
+    "provider": "openai",
+    "model": "gemini-3.1-flash",
+    "apiBase": "http://127.0.0.1:8045/v1",
+    "apiKey": "sk-antigravity"
+  },
+  "slashCommands": [
+    { "name": "share", "description": "Exportar conversacion como Markdown" },
+    { "name": "commit", "description": "Generar mensaje de commit Git" },
+    { "name": "edit", "description": "Editar codigo seleccionado" }
+  ],
+  "allowAnonymousTelemetry": false,
+  "embeddingsProvider": {
+    "provider": "openai",
+    "model": "text-embedding-3-small",
+    "apiBase": "http://127.0.0.1:8045/v1",
+    "apiKey": "sk-antigravity"
+  }
+}
