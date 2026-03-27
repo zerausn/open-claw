@@ -42,6 +42,58 @@ function New-RandomPassword {
     -join $result
 }
 
+function Wait-ServiceHealthy {
+    param(
+        [int]$HealthPort,
+        [int]$Attempts = 20,
+        [int]$DelaySeconds = 2
+    )
+
+    for ($i = 0; $i -lt $Attempts; $i++) {
+        Start-Sleep -Seconds $DelaySeconds
+        try {
+            $resp = Invoke-WebRequest -Uri "http://127.0.0.1:$HealthPort/health" -TimeoutSec 3 -UseBasicParsing
+            if ($resp.StatusCode -eq 200) {
+                return $true
+            }
+        } catch {
+        }
+    }
+
+    return $false
+}
+
+function Update-UiConfig {
+    param(
+        [string]$ConfigPath,
+        [string]$Language,
+        [bool]$LanEnabled,
+        [int]$ListenPort
+    )
+
+    if (-not (Test-Path $ConfigPath)) {
+        Write-Warn "No se encontro gui_config.json para ajustar el idioma."
+        return $false
+    }
+
+    try {
+        $config = Get-Content -Path $ConfigPath -Raw | ConvertFrom-Json
+        $config.language = $Language
+
+        if ($null -ne $config.proxy) {
+            $config.proxy.allow_lan_access = $LanEnabled
+            $config.proxy.port = $ListenPort
+        }
+
+        $config | ConvertTo-Json -Depth 12 | Set-Content -Path $ConfigPath -Encoding utf8
+        Write-Ok "Interfaz configurada en espanol."
+        return $true
+    } catch {
+        Write-Warn "No se pudo actualizar gui_config.json: $($_.Exception.Message)"
+        return $false
+    }
+}
+
 if ([string]::IsNullOrWhiteSpace($WebPassword)) {
     $WebPassword = New-RandomPassword
     Write-Warn "No se recibio WebPassword. Se genero una clave aleatoria segura."
@@ -124,23 +176,26 @@ docker run -d `
 Write-Ok "Contenedor iniciado."
 
 Write-Step "Esperando health check..."
-$ready = $false
-for ($i = 0; $i -lt 20; $i++) {
-    Start-Sleep -Seconds 2
-    try {
-        $resp = Invoke-WebRequest -Uri "http://127.0.0.1:$Port/health" -TimeoutSec 3 -UseBasicParsing
-        if ($resp.StatusCode -eq 200) {
-            $ready = $true
-            break
-        }
-    } catch {
-    }
-}
+$ready = Wait-ServiceHealthy -HealthPort $Port
 
 if ($ready) {
     Write-Ok "Servicio disponible en http://127.0.0.1:$Port"
 } else {
     Write-Warn "El servicio no respondio a tiempo. Revisa: docker logs antigravity-manager"
+}
+
+$guiConfigPath = Join-Path $dataDir "gui_config.json"
+
+Write-Step "Ajustando idioma y preferencias de interfaz..."
+if (Update-UiConfig -ConfigPath $guiConfigPath -Language "es" -LanEnabled ([bool]$AllowLanAccess) -ListenPort $Port) {
+    docker restart antigravity-manager | Out-Null
+    Write-Ok "Contenedor reiniciado para aplicar el idioma."
+
+    if (Wait-ServiceHealthy -HealthPort $Port) {
+        Write-Ok "Servicio verificado despues de aplicar la configuracion."
+    } else {
+        Write-Warn "La interfaz se actualizo, pero el health check no respondio tras reiniciar."
+    }
 }
 
 Write-Step "Generando configuracion para Continue..."

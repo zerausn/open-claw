@@ -19,6 +19,7 @@ Notas:
   - password debil por defecto
   - publicacion en localhost por defecto
   - imagen Docker fijada por digest
+- La interfaz web queda forzada a espanol en `gui_config.json` para evitar que reaparezca en chino.
 - Se elimino la configuracion de embeddings de Continue porque este proxy no expone `text-embedding-3-small` en esta instalacion.
 
 Estado actual:
