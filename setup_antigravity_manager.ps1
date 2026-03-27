@@ -9,7 +9,9 @@ param(
     [string]$WebPassword = "",
     [ValidateRange(1, 65535)]
     [int]$Port = 8045,
-    [string]$Image = "lbjlaq/antigravity-manager@sha256:50ff8bd5bce3fab30ed9cc2a022c19abec325d35561a816168dabd2dda2abea8",
+    [string]$Image = "antigravity-manager-local:4.1.31-es",
+    [string]$SourceDir = "",
+    [switch]$RebuildImage,
     [switch]$AllowLanAccess
 )
 
@@ -85,13 +87,39 @@ function Update-UiConfig {
             $config.proxy.port = $ListenPort
         }
 
-        $config | ConvertTo-Json -Depth 12 | Set-Content -Path $ConfigPath -Encoding utf8
+        $json = $config | ConvertTo-Json -Depth 12
+        $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+        [System.IO.File]::WriteAllText($ConfigPath, $json, $utf8NoBom)
         Write-Ok "Interfaz configurada en espanol."
         return $true
     } catch {
         Write-Warn "No se pudo actualizar gui_config.json: $($_.Exception.Message)"
         return $false
     }
+}
+
+function Resolve-SourceDir {
+    param([string]$ConfiguredSourceDir)
+
+    if (-not [string]::IsNullOrWhiteSpace($ConfiguredSourceDir)) {
+        return $ConfiguredSourceDir
+    }
+
+    if ($PSScriptRoot) {
+        $siblingDir = Join-Path (Split-Path $PSScriptRoot -Parent) "antigravity-manager-src"
+        if (Test-Path $siblingDir) {
+            return $siblingDir
+        }
+    }
+
+    return (Join-Path $env:USERPROFILE "Documents\Antigravity\antigravity-manager-src")
+}
+
+function Test-DockerImageExists {
+    param([string]$ImageName)
+
+    docker image inspect $ImageName *> $null
+    return ($LASTEXITCODE -eq 0)
 }
 
 if ([string]::IsNullOrWhiteSpace($WebPassword)) {
@@ -107,6 +135,7 @@ $dataDir = Join-Path $env:USERPROFILE ".antigravity_tools"
 $continueDir = Join-Path $env:USERPROFILE ".continue"
 $continueConfigPath = Join-Path $continueDir "config.json"
 $kiloSettingsPath = Join-Path $env:USERPROFILE "antigravity_manager_kilo_settings.json"
+$resolvedSourceDir = Resolve-SourceDir -ConfiguredSourceDir $SourceDir
 
 Write-Step "Verificando Docker Desktop..."
 try {
@@ -153,15 +182,47 @@ if (-not (Test-Path $continueDir)) {
 Write-Ok "Datos en: $dataDir"
 Write-Ok "Continue en: $continueDir"
 
-if ($Image -like "*:latest") {
+if ($Image -like "antigravity-manager-local:*") {
+    Write-Ok "Instalacion configurada para usar imagen local: $Image"
+} elseif ($Image -like "*:latest") {
     Write-Warn "La imagen usa el tag 'latest'. Funciona, pero es menos predecible que fijar una version."
 } elseif ($Image -match "@sha256:") {
     Write-Ok "Imagen fijada por digest para instalaciones reproducibles."
 }
 
-Write-Step "Descargando imagen del contenedor..."
-docker pull $Image | Out-Null
-Write-Ok "Imagen lista: $Image"
+Write-Step "Preparando imagen del contenedor..."
+if ((-not $RebuildImage) -and (Test-DockerImageExists -ImageName $Image)) {
+    Write-Ok "Imagen encontrada localmente: $Image"
+} else {
+    $dockerfilePath = Join-Path $resolvedSourceDir "docker\\Dockerfile"
+    if (-not (Test-Path $dockerfilePath)) {
+        Write-Host @" 
+
+[ERROR] No se encontro una imagen local ni un Dockerfile util para construirla.
+
+Ruta esperada del codigo fuente:
+$resolvedSourceDir
+
+Se esperaba encontrar:
+$dockerfilePath
+
+Clona o prepara primero el fuente local de Antigravity-Manager y vuelve a ejecutar este script.
+"@ -ForegroundColor Red
+        exit 1
+    }
+
+    Write-Ok "Fuente local detectada en: $resolvedSourceDir"
+    if ($RebuildImage -and (Test-DockerImageExists -ImageName $Image)) {
+        Write-Warn "Se reconstruira la imagen local existente: $Image"
+    }
+    Write-Step "Construyendo imagen local desde codigo fuente..."
+    docker build -t $Image -f $dockerfilePath $resolvedSourceDir
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[ERROR] Fallo la construccion de la imagen local." -ForegroundColor Red
+        exit 1
+    }
+    Write-Ok "Imagen local construida: $Image"
+}
 
 Write-Step "Iniciando Antigravity-Manager..."
 docker run -d `

@@ -9,6 +9,10 @@ Tienes acceso a un proxy local llamado **Antigravity-Manager** que corre en
 `http://127.0.0.1:8045`. Este proxy convierte multiples cuentas de Google
 en un endpoint OpenAI-compatible con rotacion automatica de cuota.
 
+La instalacion actual esta pensada para ejecutarse desde una imagen Docker
+local construida a partir de una copia local del fuente, con la interfaz en
+espanol por defecto.
+
 - **Base URL:** `http://127.0.0.1:8045/v1`
 - **API Key:** `sk-antigravity`
 - **Modelos disponibles:** `gemini-3.1-pro-high`, `gemini-3.1-flash`,

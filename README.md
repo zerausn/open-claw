@@ -1,29 +1,58 @@
 # open-claw
 
-Repositorio local preparado dentro de `Antigravity` para agrupar los archivos revisados:
+Repositorio de trabajo para dejar Antigravity-Manager instalable de forma local, en espanol y sin depender de la imagen publicada por terceros en tiempo de ejecucion.
+
+## Archivos principales
 
 - `AGENTS.md`
 - `continue_config.json`
 - `setup_antigravity_manager.ps1`
 
-Origen de los archivos:
+## Estado actual
 
-- `C:\Users\ZN-\Downloads\AGENTS.md`
-- `C:\Users\ZN-\Downloads\continue_config.json`
-- `C:\Users\ZN-\Downloads\setup_antigravity_manager.ps1`
+- Este repo vive en `C:\Users\ZN-\Documents\Antigravity\open-claw`.
+- `origin` apunta a `https://github.com/zerausn/open-claw`.
+- La rama `main` ya esta publicada en GitHub.
+- La instalacion actual corre con la imagen local `antigravity-manager-local:4.1.31-es`.
 
-Notas:
+## Fuente local usada para construir la imagen
 
-- Los archivos fueron normalizados para evitar texto roto por problemas de codificacion.
-- `setup_antigravity_manager.ps1` fue revisado para reducir algunos riesgos basicos:
-  - password debil por defecto
-  - publicacion en localhost por defecto
-  - imagen Docker fijada por digest
-- La interfaz web queda forzada a espanol en `gui_config.json` para evitar que reaparezca en chino.
-- Se elimino la configuracion de embeddings de Continue porque este proxy no expone `text-embedding-3-small` en esta instalacion.
+El instalador ya no hace `docker pull` de `lbjlaq/antigravity-manager` por defecto.
 
-Estado actual:
+Ahora hace esto:
 
-- Este repo local ya existe en `C:\Users\ZN-\Documents\Antigravity\open-claw`.
-- El remoto `git@github.com:zerausn/open-claw.git` ya existe.
-- `origin` esta configurado y la rama `main` ya fue publicada en GitHub.
+1. Busca la imagen local `antigravity-manager-local:4.1.31-es`.
+2. Si no existe, intenta construirla desde una copia local del codigo fuente.
+3. Por defecto busca el fuente en una carpeta hermana:
+   `C:\Users\ZN-\Documents\Antigravity\antigravity-manager-src`
+4. Tambien puedes pasar una ruta explicita con `-SourceDir`.
+5. Si cambias el fuente y quieres regenerar la imagen, usa `-RebuildImage`.
+
+Ejemplo:
+
+```powershell
+.\setup_antigravity_manager.ps1 `
+  -SourceDir "C:\Users\ZN-\Documents\Antigravity\antigravity-manager-src" `
+  -RebuildImage
+```
+
+## Garantias que deja el instalador
+
+- Publicacion de Docker en `127.0.0.1` por defecto.
+- Interfaz web forzada a espanol en `gui_config.json`.
+- Password del panel generada automaticamente si no se pasa una segura.
+- Configuracion de Continue sin embeddings no soportados en esta instalacion.
+
+Nota tecnica:
+en Docker para Windows, publicar `127.0.0.1:8045:8045` en el host ya deja el panel solo local.
+No conviene forzar `127.0.0.1` dentro del contenedor porque eso rompe el acceso desde el host.
+
+## Nota sobre el fuente local
+
+La copia local del proyecto upstream fue ajustada para:
+
+- arrancar en espanol por defecto
+- usar `es` como fallback de i18n
+- preferir formato y fechas en espanol
+
+La idea es que el runtime dependa de una imagen que tu mismo puedes reconstruir desde fuente local, no de una imagen remota de tercero.
