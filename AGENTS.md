@@ -15,7 +15,7 @@ espanol por defecto.
 
 - **Base URL:** `http://127.0.0.1:8045/v1`
 - **API Key:** `sk-antigravity`
-- **Modelos disponibles:** `gemini-3.1-pro-high`, `gemini-3.1-flash`,
+- **Modelos disponibles:** `gemini-3.1-pro-high`, `gemini-3-flash`,
   `claude-sonnet-4-6`, `claude-opus-4-6`
 
 ## Configurar Antigravity IDE para usar el proxy
@@ -48,7 +48,7 @@ Luego fusiona este bloque en el JSON de settings:
   "antigravity.openAiCompatApiKey": "sk-antigravity",
   "antigravity.openAiCompatModel": "gemini-3.1-pro-high",
   "antigravity.fallbackModels": [
-    "gemini-3.1-flash",
+    "gemini-3-flash",
     "claude-sonnet-4-6"
   ]
 }
@@ -91,7 +91,7 @@ Invoke-WebRequest http://127.0.0.1:8045/health -UseBasicParsing
 
 # 3. Test de completions
 $body = @{
-  model = "gemini-3.1-flash"
+  model = "gemini-3-flash"
   messages = @(@{ role = "user"; content = "Responde solo: OK" })
   max_tokens = 10
 } | ConvertTo-Json -Depth 3

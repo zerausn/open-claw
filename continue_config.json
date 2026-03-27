@@ -8,9 +8,9 @@
       "apiKey": "sk-antigravity"
     },
     {
-      "title": "Gemini 3.1 Flash - Antigravity-Manager",
+      "title": "Gemini 3 Flash - Antigravity-Manager",
       "provider": "openai",
-      "model": "gemini-3.1-flash",
+      "model": "gemini-3-flash",
       "apiBase": "http://127.0.0.1:8045/v1",
       "apiKey": "sk-antigravity"
     },
@@ -30,9 +30,9 @@
     }
   ],
   "tabAutocompleteModel": {
-    "title": "Flash Autocomplete",
+    "title": "Gemini 3 Flash Autocomplete",
     "provider": "openai",
-    "model": "gemini-3.1-flash",
+    "model": "gemini-3-flash",
     "apiBase": "http://127.0.0.1:8045/v1",
     "apiKey": "sk-antigravity"
   },

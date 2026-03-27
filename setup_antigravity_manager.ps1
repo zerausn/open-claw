@@ -270,9 +270,9 @@ $continueConfig = [ordered]@{
             apiKey = $ApiKey
         },
         [ordered]@{
-            title = "Gemini 3.1 Flash - Antigravity-Manager"
+            title = "Gemini 3 Flash - Antigravity-Manager"
             provider = "openai"
-            model = "gemini-3.1-flash"
+            model = "gemini-3-flash"
             apiBase = "http://127.0.0.1:$Port/v1"
             apiKey = $ApiKey
         },
@@ -292,9 +292,9 @@ $continueConfig = [ordered]@{
         }
     )
     tabAutocompleteModel = [ordered]@{
-        title = "Gemini Flash Autocomplete"
+        title = "Gemini 3 Flash Autocomplete"
         provider = "openai"
-        model = "gemini-3.1-flash"
+        model = "gemini-3-flash"
         apiBase = "http://127.0.0.1:$Port/v1"
         apiKey = $ApiKey
     }
