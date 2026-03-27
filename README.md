@@ -15,13 +15,13 @@ Origen de los archivos:
 Notas:
 
 - Los archivos fueron normalizados para evitar texto roto por problemas de codificacion.
-- `setup_antigravity_manager.ps1` fue endurecido para reducir riesgos basicos:
+- `setup_antigravity_manager.ps1` fue revisado para reducir algunos riesgos basicos:
   - password debil por defecto
-  - exposicion de puertos en todas las interfaces
-  - uso poco predecible de `latest`
+  - publicacion en localhost por defecto
+  - advertencia explicita sobre el uso de `latest`
 
 Estado actual:
 
 - Este repo local ya existe en `C:\Users\ZN-\Documents\Antigravity\open-claw`.
-- El remoto `git@github.com:zerausn/open-claw.git` todavia no existe.
-- En cuanto exista el repo en GitHub, solo faltaria agregar `origin` y hacer `push`.
+- El remoto `git@github.com:zerausn/open-claw.git` ya existe.
+- `origin` esta configurado y la rama `main` ya fue publicada en GitHub.
