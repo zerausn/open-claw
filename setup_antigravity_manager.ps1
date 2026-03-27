@@ -9,7 +9,7 @@ param(
     [string]$WebPassword = "",
     [ValidateRange(1, 65535)]
     [int]$Port = 8045,
-    [string]$Image = "lbjlaq/antigravity-manager:latest",
+    [string]$Image = "lbjlaq/antigravity-manager@sha256:50ff8bd5bce3fab30ed9cc2a022c19abec325d35561a816168dabd2dda2abea8",
     [switch]$AllowLanAccess
 )
 
@@ -103,6 +103,8 @@ Write-Ok "Continue en: $continueDir"
 
 if ($Image -like "*:latest") {
     Write-Warn "La imagen usa el tag 'latest'. Funciona, pero es menos predecible que fijar una version."
+} elseif ($Image -match "@sha256:") {
+    Write-Ok "Imagen fijada por digest para instalaciones reproducibles."
 }
 
 Write-Step "Descargando imagen del contenedor..."
@@ -186,12 +188,6 @@ $continueConfig = [ordered]@{
         [ordered]@{ name = "edit"; description = "Editar codigo seleccionado" }
     )
     allowAnonymousTelemetry = $false
-    embeddingsProvider = [ordered]@{
-        provider = "openai"
-        model = "text-embedding-3-small"
-        apiBase = "http://127.0.0.1:$Port/v1"
-        apiKey = $ApiKey
-    }
 }
 $continueConfig | ConvertTo-Json -Depth 6 | Set-Content -Path $continueConfigPath -Encoding utf8
 Write-Ok "Continue config -> $continueConfigPath"

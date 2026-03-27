@@ -18,7 +18,8 @@ Notas:
 - `setup_antigravity_manager.ps1` fue revisado para reducir algunos riesgos basicos:
   - password debil por defecto
   - publicacion en localhost por defecto
-  - advertencia explicita sobre el uso de `latest`
+  - imagen Docker fijada por digest
+- Se elimino la configuracion de embeddings de Continue porque este proxy no expone `text-embedding-3-small` en esta instalacion.
 
 Estado actual:
 

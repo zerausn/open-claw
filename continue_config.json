@@ -41,11 +41,5 @@
     { "name": "commit", "description": "Generar mensaje de commit Git" },
     { "name": "edit", "description": "Editar codigo seleccionado" }
   ],
-  "allowAnonymousTelemetry": false,
-  "embeddingsProvider": {
-    "provider": "openai",
-    "model": "text-embedding-3-small",
-    "apiBase": "http://127.0.0.1:8045/v1",
-    "apiKey": "sk-antigravity"
-  }
+  "allowAnonymousTelemetry": false
 }
