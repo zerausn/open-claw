@@ -1,0 +1,23 @@
+{
+  "project_name": "open-claw",
+  "base_branch": "main",
+  "branch_prefix": "codex/",
+  "git": {
+    "push_remote": "origin",
+    "base_remote": "origin"
+  },
+  "validation": {
+    "local": [
+      "[void][scriptblock]::Create((Get-Content 'setup_antigravity_manager.ps1' -Raw))",
+      "Get-Content 'continue_config.json' -Raw | ConvertFrom-Json | Out-Null"
+    ],
+    "ci": [
+      "pwsh -NoProfile -Command \"[void][scriptblock]::Create((Get-Content 'setup_antigravity_manager.ps1' -Raw))\"",
+      "python -c \"import json, pathlib; json.loads(pathlib.Path('continue_config.json').read_text(encoding='utf-8')); print('continue_config ok')\""
+    ]
+  },
+  "pull_request": {
+    "enabled": true,
+    "draft": true
+  }
+}
